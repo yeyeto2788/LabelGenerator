@@ -1,0 +1,7 @@
+{
+  "python.formatting.provider": "black",
+  "python.testing.pytestEnabled": true,
+  "editor.formatOnSave": true,
+  "spellright.language": ["en_US"],
+  "spellright.documentTypes": ["markdown", "latex", "plaintext"]
+}

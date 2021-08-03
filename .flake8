@@ -1,0 +1,30 @@
+[flake8]
+max-line-length = 120
+exclude = 
+  .git,
+  __pycache__,
+  README.md,
+  poetry.lock,
+  Dockerfile,
+  .pre-commit-config.yaml,
+  .flake8,
+  .gitignore,
+  requirements.txt,
+  .dockerignore,
+  pytest.ini,
+  pyproject.toml,
+  poetry.toml,
+  .vscode/*,
+  CHANGELOG.md,
+  .gitlab-ci.yml,
+  requirements-dev.txt,
+  doc/*,
+  .coveragerc,
+  venv/*,
+  .venv/*,
+  tests/test_data/*,
+  deployment/*,
+  scripts/*
+filename = *.py
+max-complexity = 15
+include = ess_automation,tests
