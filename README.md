@@ -4,7 +4,10 @@
 
 - [Label Generator :label:](#label-generator-label)
   - [Usage](#usage)
-  - [Installation :cd:](#installation-cd)
+  - [Development installation :cd:](#development-installation-cd)
+  - [Build](#build)
+    - [Python](#python)
+    - [Docker](#docker)
   - [Execution](#execution)
     - [Python :snake:](#python-snake)
     - [Docker :package:](#docker-package)
@@ -33,18 +36,41 @@ Options:
   -h, --help              Show this message and exit.
 ```
 
-## Installation :cd:
+## Development installation :cd:
 
 This step is not mandatory as we'll be heavily using docker for development and for executing the code on this repository.
 
 - Clone this repository
-  - `git clone <>`
+  - `git clone https://github.com/yeyeto2788/LabelGenerator.git`
 - Create the virtual environment and activate it
   - `poetry shell`
 - Install dependencies
   - `poetry install`
 - Instantiate the pre-commit plugin (Optional)
   - `poetry run pre-commit install`
+
+---
+
+## Build
+
+### Python
+
+For building the python package is as simple as executing the following command:
+
+```console
+poetry build
+```
+
+### Docker
+
+In order to build the docker image you need to execute the following commands
+
+```console
+GENERATOR_VERSION=$(python -c "import pkg_resources;print(pkg_resources.get_distribution('label_generator').version)")
+docker build --tag label_generator:$GENERATOR_VERSION .
+```
+
+---
 
 ## Execution
 
@@ -57,14 +83,16 @@ python ./label_generator/cli.py --text "TEXT FOR LABEL" --qr_data "https://myawe
 ### Docker :package:
 
 ```console
-docker run --rm  -v $PWD/output:/tmp label_generator --text "TEXT FOR LABEL" --qr_data "https://myawesomecode.com" -o /tmp/label1.png
+docker run --rm  -v $PWD/output:/tmp label_generator:$GENERATOR_VERSION --text "TEXT FOR LABEL" --qr_data "https://myawesomecode.com" -o /tmp/label1.png
 ```
 
 or
 
 ```console
-docker run --rm  -v $PWD/output:/tmp label_generator --from_csv /tmp/a.csv -o /tmp/label.png
+docker run --rm  -v $PWD/output:/tmp label_generator:$GENERATOR_VERSION --from_csv /tmp/a.csv -o /tmp/label.png
 ```
+
+---
 
 ## Notes :bookmark_tabs:
 
