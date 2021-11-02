@@ -31,6 +31,9 @@ Options:
   --font PATH             Font path to be use.
   --qr_data TEXT          Data to embed on the label as QR code. This option
                           is mutually exclusive with 'from_csv'.
+  -ls, --label_size <FLOAT FLOAT>...
+                                  Size in millimeters of the labels (Width,
+                                  Height)
   -v, --verbose           Sets the debug noise level, specify multiple times
                           for more verbosity.  [0<=x<=3]
   -h, --help              Show this message and exit.

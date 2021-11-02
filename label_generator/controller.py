@@ -1,7 +1,9 @@
 import csv
 import logging
+import math
 import os
 import textwrap
+import typing
 
 import qrcode
 
@@ -10,14 +12,11 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageOps
 
-from label_generator.constants import LABEL_HEIGHT
-from label_generator.constants import LABEL_WIDTH
-
 
 logger = logging.getLogger(__name__)
 
 
-def generate_label(text: str, output: str, font: str, qr_data: str):
+def generate_label(text: str, output: str, font: str, qr_data: str, label_size: typing.Tuple[float, float]):
     """Generate single label.
 
     Args:
@@ -35,6 +34,11 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
     if not output.endswith(".png"):
         ValueError(f"The extension of the file '{output}' should be '.png'")
 
+    label_width = label_size[0]
+    label_height = label_size[1]
+
+    logger.debug(f"Max widht: {label_width}, Max height: {label_height}")
+
     border_pixels = 1
     # Space between text and top and bottom border
     padding = 6
@@ -42,11 +46,14 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
     max_characters = 30
 
     if qr_data:
-        logger.debug("Generating QR code")
+        qr_box_size = math.ceil(label_height // 45)
+
+        logger.debug(f"Generating QR code with border '{qr_box_size}'")
+
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=1,
+            box_size=qr_box_size,
             border=1,
         )
         qr.add_data(qr_data)
@@ -57,21 +64,21 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
         logger.debug(f"QR generated with width: '{qr_width}' and height height: '{qr_height}'")
 
         size = (
-            LABEL_WIDTH - qr_width - (border_pixels * 2),
-            LABEL_HEIGHT - (border_pixels * 2),
+            label_width - qr_width - (border_pixels * 2),
+            label_height - (border_pixels * 2),
         )
 
     else:
-        size = (LABEL_WIDTH - (border_pixels * 2), LABEL_HEIGHT - (border_pixels * 2))
+        size = (label_width - (border_pixels * 2), label_height - (border_pixels * 2))
 
     logger.debug(f"Label text image size: '{size}'")
 
     img = Image.new("RGB", size, "white")
     drawing = ImageDraw.Draw(img)
 
-    for multiplier in range(1, 21):
+    for multiplier in range(1, 101):
         # Reduce the font size until it fits on label.
-        font_size = LABEL_HEIGHT - (2 * multiplier)
+        font_size = label_height - (2 * multiplier)
 
         if font_size < 8:
             raise ValueError(f"Provided text will not be readable.\nit has {len(text)} chars!")
@@ -86,7 +93,7 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
         text_width, text_height = drawing.textsize(image_text, font=image_font)
 
         max_label_width = size[0] - (padding // 2)
-        max_label_height = LABEL_HEIGHT - padding
+        max_label_height = label_height - padding
 
         if (text_width <= max_label_width) and (text_height <= max_label_height):
 
@@ -96,7 +103,7 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
             logger.debug(f"Total characters of the string: '{len(text)}'")
             # Try centering the text
             drawing.text(
-                (border_pixels, (LABEL_HEIGHT - text_height) // 2),
+                (border_pixels, (label_height - text_height) // 2),
                 image_text,
                 font=image_font,
                 fill="black",
@@ -107,11 +114,11 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
     # Add the QR code to the label
     if qr_data:
         # Create the border image
-        background_image = Image.new("RGB", size=(LABEL_WIDTH, LABEL_HEIGHT), color="black")
+        background_image = Image.new("RGB", size=(label_width, label_height), color="black")
         # Create white center image due to qr being different on size
         white_img = Image.new(
             "RGB",
-            size=(LABEL_WIDTH - border_pixels, LABEL_HEIGHT - border_pixels),
+            size=(label_width - border_pixels, label_height - border_pixels),
             color="white",
         )
         background_image.paste(white_img, (border_pixels, border_pixels))
@@ -119,19 +126,18 @@ def generate_label(text: str, output: str, font: str, qr_data: str):
         background_image.paste(img, (border_pixels, border_pixels))
         qr_width, qr_height = qr_img.size
         # Add the qr code image to the label
-        qr_vertical_position = (LABEL_HEIGHT - qr_height) // 2
-        background_image.paste(qr_img, (LABEL_WIDTH - qr_width, qr_vertical_position))
+        qr_vertical_position = (label_height - qr_height) // 2
+        background_image.paste(qr_img, (label_width - qr_width, qr_vertical_position))
     else:
         # Add border to the image
         background_image = ImageOps.expand(img, border=border_pixels, fill="black")
 
     logger.debug(f"Saving image at {output}")
     background_image.save(output)
-    background_image.close()
     logger.info(f"Image saved at {output}")
 
 
-def generate_labels_from_csv(csv_path: str, font: str, output: str):
+def generate_labels_from_csv(csv_path: str, font: str, output: str, label_size: typing.Tuple[float, float]):
 
     with open(csv_path) as csv_file:
         # Get the lines with data and skip empty ones.
@@ -143,22 +149,21 @@ def generate_labels_from_csv(csv_path: str, font: str, output: str):
         # Skip csv headers
         next(csv_reader)
         # Create base image where all images are being pasted
-        base_image = Image.new("RGB", (LABEL_WIDTH, LABEL_HEIGHT * images_count), color="white")
+        base_image = Image.new(
+            "RGB",
+            (label_size[0], label_size[1] * images_count),
+            color="white",
+        )
         paste_height = 0
 
         for index, row in enumerate(csv_reader):
             logger.debug(f"Generating label with data '{row}'")
             filename = f"./{index}.png"
-            generate_label(
-                text=row["text"],
-                output=filename,
-                font=font,
-                qr_data=row["qr_data"],
-            )
+            generate_label(text=row["text"], output=filename, font=font, qr_data=row["qr_data"], label_size=label_size)
             logger.debug(f"Opening image '{filename}'")
             # Open image to paste
             image_to_paste = Image.open(filename)
-            paste_height = LABEL_HEIGHT * index
+            paste_height = label_size[1] * index
             base_image.paste(image_to_paste, box=(0, paste_height))
             image_to_paste.close()
             # Delete label already pasted.

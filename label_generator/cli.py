@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import logging
+import math
 import os
 
 import click
 
 from label_generator.constants import DEBUG_LOGGING_MAP
 from label_generator.constants import FONTS_DIR
+from label_generator.constants import LABEL_HEIGHT
+from label_generator.constants import LABEL_WIDTH
+from label_generator.constants import MM_PER_PIXEL
 from label_generator.controller import generate_label
 from label_generator.controller import generate_labels_from_csv
 
@@ -80,13 +84,26 @@ class Mutex(click.Option):
     help="Data to embed on the label as QR code.",
 )
 @click.option(
+    "-ls",
+    "--label_size",
+    default=(LABEL_WIDTH, LABEL_HEIGHT),
+    nargs=2,
+    type=click.Tuple([click.FLOAT, click.FLOAT]),
+    required=False,
+    help="Size in millimeters of the labels (Width, Height)",
+)
+@click.option(
     "--verbose",
     "-v",
     help="Sets the debug noise level, specify multiple times " "for more verbosity.",
     type=click.IntRange(0, 3, clamp=True),
     count=True,
 )
-def main_cli(text, output_path, font, qr_data, verbose, from_csv):
+def main_cli(text, output_path, font, qr_data, verbose, from_csv, label_size):
+
+    label_width = LABEL_WIDTH if label_size[0] == LABEL_WIDTH else math.floor(label_size[0] / MM_PER_PIXEL)
+    label_height = LABEL_HEIGHT if label_size[1] == LABEL_HEIGHT else math.floor(label_size[1] / MM_PER_PIXEL)
+    label_size = (label_width, label_height)
 
     if verbose > 0:
 
@@ -96,10 +113,12 @@ def main_cli(text, output_path, font, qr_data, verbose, from_csv):
     logger.debug(f"Executing script from '{os.getcwd()}'")
 
     if from_csv:
-        generate_labels_from_csv(csv_path=from_csv, font=font, output=os.path.abspath(output_path))
+        generate_labels_from_csv(
+            csv_path=from_csv, font=font, output=os.path.abspath(output_path), label_size=label_size
+        )
 
     else:
-        generate_label(text, output=os.path.abspath(output_path), font=font, qr_data=qr_data)
+        generate_label(text, output=os.path.abspath(output_path), font=font, qr_data=qr_data, label_size=label_size)
 
 
 if __name__ == "__main__":
