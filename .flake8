@@ -25,6 +25,8 @@ exclude =
   tests/test_data/*,
   deployment/*,
   scripts/*
+  sample.csv
+  *.png
 filename = *.py
 max-complexity = 15
 include = ess_automation,tests

@@ -10,7 +10,10 @@
     - [Docker](#docker)
   - [Execution](#execution)
     - [Python :snake:](#python-snake)
+      - [Generate single label:](#generate-single-label)
     - [Docker :package:](#docker-package)
+      - [Generating a single label:](#generating-a-single-label)
+      - [Generating labels from a CSV file:](#generating-labels-from-a-csv-file)
   - [Notes :bookmark_tabs:](#notes-bookmark_tabs)
   - [FAQ :raising_hand_woman::raising_hand_man:](#faq-raising_hand_womanraising_hand_man)
   - [Support :mechanic:](#support-mechanic)
@@ -79,21 +82,31 @@ docker build --tag label_generator:$GENERATOR_VERSION .
 
 ### Python :snake:
 
+#### Generate single label:
+
 ```console
-python ./label_generator/cli.py --text "TEXT FOR LABEL" --qr_data "https://myawesomecode.com"
+python ./label_generator/cli.py --text "TEXT FOR LABEL" --qr_data "https://myawesomecode.com" -ls 160 40
 ```
 
+![Custom size label](docs/images/sample_execution_custom_size.png)
+
 ### Docker :package:
+
+#### Generating a single label:
 
 ```console
 docker run --rm  -v $PWD/output:/tmp label_generator:$GENERATOR_VERSION --text "TEXT FOR LABEL" --qr_data "https://myawesomecode.com" -o /tmp/label1.png
 ```
 
-or
+![Single label generated](docs/images/sample_execution.png)
+
+#### Generating labels from a CSV file:
 
 ```console
-docker run --rm  -v $PWD/output:/tmp label_generator:$GENERATOR_VERSION --from_csv /tmp/a.csv -o /tmp/label.png
+docker run --rm  -v $PWD/output:/tmp label_generator:$GENERATOR_VERSION --from_csv /tmp/sample.csv -o /tmp/label.png
 ```
+
+![Labels generated from csv file](./docs/images/sample_csv_execution.png)
 
 ---
 
