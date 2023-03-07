@@ -14,7 +14,6 @@ classifiers = [
   "",
   "",
 ]
-
 packages = [
     { include = "label_generator" },
 ]

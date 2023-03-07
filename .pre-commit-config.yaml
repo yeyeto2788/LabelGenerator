@@ -13,15 +13,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: export_setup
-        name: Export setup.py
-        entry: scripts/generate_setup.sh
-        pass_filenames: false
-        language: script
-        always_run: true
-
-  - repo: local
-    hooks:
       - id: sort_imports
         name: Sort library imports
         entry: poetry run isort label_generator
