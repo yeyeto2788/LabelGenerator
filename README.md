@@ -14,8 +14,8 @@
     - [Docker :package:](#docker-package)
       - [Generating a single label:](#generating-a-single-label)
       - [Generating labels from a CSV file:](#generating-labels-from-a-csv-file)
-  - [Notes :bookmark_tabs:](#notes-bookmark_tabs)
-  - [FAQ :raising_hand_woman::raising_hand_man:](#faq-raising_hand_womanraising_hand_man)
+  - [Notes :bookmark\_tabs:](#notes-bookmark_tabs)
+  - [FAQ :raising\_hand\_woman::raising\_hand\_man:](#faq-raising_hand_womanraising_hand_man)
   - [Support :mechanic:](#support-mechanic)
   - [Contributing](#contributing)
   - [License](#license)
@@ -51,7 +51,7 @@ This step is not mandatory as we'll be heavily using docker for development and 
 - Create the virtual environment and activate it
   - `poetry shell`
 - Install dependencies
-  - `poetry install`
+  - `poetry install --group dev`
 - Instantiate the pre-commit plugin (Optional)
   - `poetry run pre-commit install`
 

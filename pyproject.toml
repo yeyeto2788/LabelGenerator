@@ -23,7 +23,7 @@ packages = [
 label_generator = "label_generator.cli:main_cli"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 click = "^8.0.1"
 Pillow = "^8.3.1"
 qrcode = {extras = ["pil"], version = "^7.2"}

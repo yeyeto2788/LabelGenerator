@@ -1,3 +1,5 @@
+poetry.lock
+
 # Docker output files.
 output/
 

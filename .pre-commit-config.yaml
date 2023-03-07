@@ -62,7 +62,7 @@ repos:
         name: Export requeriments-dev.txt
         language: system
         pass_filenames: false
-        entry: poetry export --dev --without-hashes --with-credentials -o requirements-dev.txt
+        entry: poetry export --with dev --without-hashes --with-credentials -o requirements-dev.txt
         files: ^(pyproject.toml|poetry.lock)$
         always_run: true
 
@@ -70,7 +70,7 @@ repos:
     hooks:
       - id: bandit
         name: Check for vulnerabilities
-        entry: poetry run bandit --exclude "./.venv/*,./test/*,./venv/*" -r -ll .
+        entry: poetry run bandit --exclude "./.venv/*,./tests/*,./venv/*" -r -ll .
         pass_filenames: false
         verbose: true
         language: system
